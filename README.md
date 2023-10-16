@@ -7,6 +7,7 @@ Bước 3: Vào tập tin theo hình theo hình
 ![image](https://github.com/phanminhquan/Do_An_N2023/assets/87330366/c126f5e8-c975-482a-9859-131db8999892)
 Bước 3: Config các thông tin username và password đã set trong hệ quản trị cơ sở dữ liệu MySQL.
 ![image](https://github.com/phanminhquan/Do_An_N2023/assets/87330366/ba472d3a-f74b-4d19-9246-e4ada7e1b350)
+
 Bước 4: Chạy chương trình
 
 # Client
