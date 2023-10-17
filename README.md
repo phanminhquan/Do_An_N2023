@@ -16,7 +16,7 @@ Bước 4: Vào tập tin theo hình theo hình
 Bước 5: Config các thông tin username và password đã set trong hệ quản trị cơ sở dữ liệu MySQL.
 ![image](https://github.com/phanminhquan/Do_An_N2023/assets/87330366/ba472d3a-f74b-4d19-9246-e4ada7e1b350)
 
-Bước 4: Chạy chương trình
+Bước 6: Chạy chương trình
 
 # Client
 Bước 1: Mở folder client bằng visual studio code.
