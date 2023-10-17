@@ -4,6 +4,7 @@
 Bước 1: Cài đặt Hệ quản trị cơ sở dữ liệu MySQL, tạo database tên "iotdatabase" 
 
 Bước 2: import dữ liệu vào database
+
 ![image](image.png)
 
 ![image](image-1.png)
