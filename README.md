@@ -8,6 +8,12 @@ Bước 2: import dữ liệu vào database
 
 Bước 3: Mở file Server bằng IDE đã cài đặt ngôn ngữ Java.
 
+![image](https://github.com/phanminhquan/Do_An_N2023/assets/87330366/93d31bac-9f4e-475e-a534-7651a03f74fb)
+
+![image](https://github.com/phanminhquan/Do_An_N2023/assets/87330366/ee751173-1c10-4b09-a6e1-9315cfc02105)
+
+
+
 Bước 4: Vào tập tin theo hình theo hình
 ![image](https://github.com/phanminhquan/Do_An_N2023/assets/87330366/c126f5e8-c975-482a-9859-131db8999892)
 Bước 5: Config các thông tin username và password đã set trong hệ quản trị cơ sở dữ liệu MySQL.
