@@ -16,4 +16,4 @@ Bước 2: Bật terminal của visual code và gõ lệnh "npm i" và enter
 Bước 3: Chạy client bằng lệnh "npm start" và enter
 
 # Lưu ý
-Luôn luôn chạy phí server trước khi chạy client
+Luôn luôn chạy phía server trước khi chạy client
