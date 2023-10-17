@@ -5,9 +5,6 @@ Bước 1: Cài đặt Hệ quản trị cơ sở dữ liệu MySQL, tạo datab
 
 Bước 2: import dữ liệu vào database
 
-![image](image.png)
-
-![image](image-1.png)
 
 Bước 3: Mở file Server bằng IDE đã cài đặt ngôn ngữ Java.
 
