@@ -5,7 +5,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 
 import { styled, alpha } from '@mui/material/styles';
 import { Box, Link, Button, Drawer, Typography, Avatar, Stack } from '@mui/material';
-import { MyUserContext } from '../App';
+import { AdminContext, MyUserContext } from '../App';
 
 // mock
 import { navConfig } from '../configs/NavConfig';
@@ -39,17 +39,17 @@ const StyledAccount = styled('div')(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-Nav.propTypes = {
+AdminNav.propTypes = {
   openNav: PropTypes.bool,
   onCloseNav: PropTypes.func,
 };
 
-export default function Nav({ openNav, onCloseNav }) {
-  const [user, dispatch] = useContext(MyUserContext);
+export default function AdminNav({ openNav, onCloseNav }) {
+  const [user, dispatch] = useContext(AdminContext);
   const icon = (name) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ width: 1, height: 1 }} />;
   const output = [
     {
-      title: 'dashboard',
+      title: 'Người dùng',
       path: '/dashboard/app',
       icon: icon('ic_analytics'),
     },
@@ -62,13 +62,13 @@ export default function Nav({ openNav, onCloseNav }) {
 
 
   ];
-  // if (user == null) {
-  //   output.push({
-  //     title: 'login',
-  //     path: '/login',
-  //     icon: icon('ic_lock'),
-  //   })
-  // }
+  if (user == null) {
+    output.push({
+      title: 'login',
+      path: '/login',
+      icon: icon('ic_lock'),
+    })
+  }
 
   // const [user, dispatch] = useContext(MyUserContext);
   const { pathname } = useLocation();
@@ -83,8 +83,8 @@ export default function Nav({ openNav, onCloseNav }) {
   }, [pathname]);
 
 
-  // if (user == null)
-  //   return <Navigate to="/login" />
+  if (user == null)
+    return <Navigate to="/admin/login" />
   return (
     <Box
       component="nav"
@@ -116,7 +116,7 @@ export default function Nav({ openNav, onCloseNav }) {
                 <Logo />
               </Box>
 
-              {/* <Box sx={{ mb: 5, mx: 2.5 }}>
+              <Box sx={{ mb: 5, mx: 2.5 }}>
                 <Link underline="none">
                   <StyledAccount>
                     <Avatar src={account.photoURL} alt="photoURL" />
@@ -132,7 +132,7 @@ export default function Nav({ openNav, onCloseNav }) {
                     </Box>
                   </StyledAccount>
                 </Link>
-              </Box> */}
+              </Box>
 
               <NavSection data={output} />
 

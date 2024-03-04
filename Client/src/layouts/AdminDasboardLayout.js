@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 // @mui
 import { styled } from '@mui/material/styles';
-import Header from './Header';
-import Nav from './Nav';
+import AdminHeader from './AdminHeader';
+import AdminNav from './AdminNav';
 
 //
 
@@ -41,9 +41,9 @@ export default function DashboardLayout() {
 
   return (
     <StyledRoot>
-      <Header onOpenNav={() => setOpen(true)} />
+      <AdminHeader onOpenNav={() => setOpen(true)} />
 
-      <Nav openNav={open} onCloseNav={() => setOpen(false)} />
+      <AdminNav openNav={open} onCloseNav={() => setOpen(false)} />
 
       <Main>
         <Outlet />

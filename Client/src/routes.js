@@ -8,9 +8,13 @@ import LoginPage from './pages/LoginPage';
 import DashboardAppPage from './pages/DashboardAppPage';
 import Detail from './pages/Detail';
 import DashboardLayout from './layouts/DashboardLayout';
+import AdminDashboardLayout from './layouts/AdminDasboardLayout';
 import SimpleLayout from './layouts/SimpleLayout';
 import NotFound from './pages/NotFound';
 import Register from './pages/Register';
+import AdminLogin from './pages/AdminLogin';
+import AdminDashboardAppPage from './pages/AdminDasboardAppPage';
+import EditUser from './pages/EditUser';
 
 // ----------------------------------------------------------------------
 
@@ -25,9 +29,8 @@ Router() {
         { path: 'app', element: <DashboardAppPage /> },
         { path: 'user', element: <UserPage /> },
         {path :"info/:id", element: <Detail/>},
-        {path :"register", element: <Register/>}
-
-        
+        {path :"register", element: <Register/>},
+        {path :"admin/login", element: <AdminLogin/>}
       ],
     },
     {
@@ -51,6 +54,18 @@ Router() {
     {
       path: '/404',
       element: <NotFound />,
+    }
+    ,{
+      path: '/admin/login',
+      element: <AdminLogin />,
+    },
+    {
+      path : "/admin",
+      element: <AdminDashboardLayout />,
+      children: [
+        { path: "home" ,element: <AdminDashboardAppPage/>, index : true },
+        {path :"user/:id", element: <EditUser/>},
+      ],
     }
   ]);
 

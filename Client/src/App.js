@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useReducer } from 'react';
 import cookie from "react-cookies";
-import { BrowserRouter, Navigate } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import SockJS from 'sockjs-client';
 import { over } from 'stompjs';
@@ -15,6 +15,7 @@ import { StyledChart } from './components/chart';
 import ScrollToTop from './components/scroll-to-top';
 import MyUserReducer from './produces/MyUserReducer';
 import Apis, { endpoints } from './configs/Apis';
+import AdminReducer from './produces/AdminReducer';
 
 
 
@@ -23,10 +24,12 @@ import Apis, { endpoints } from './configs/Apis';
 // ----------------------------------------------------------------------
 
 export const MyUserContext = createContext();
+export const AdminContext = createContext();
 
 export default function App() {
   let stompClient = null;
   const [user, dispatch] = useReducer(MyUserReducer, cookie.load("user") || null);
+  const [admin, adminDispatch] = useReducer(AdminReducer, cookie.load("user") || null);
 
   const expiration = cookie.load("expiration")
   const onPrivateMessage = (payload) => {
@@ -44,8 +47,6 @@ export default function App() {
     };
     stompClient.send("/app/message", {}, JSON.stringify(chatMessage));
   }
-
-
   React.useEffect(() => {
     const Sock = new SockJS('http://localhost:9000/ws');
     stompClient = over(Sock);
@@ -61,6 +62,7 @@ export default function App() {
 
   return (
     <MyUserContext.Provider value={[user, dispatch]}>
+      <AdminContext.Provider value={[admin,adminDispatch]}>
       <HelmetProvider>
         <BrowserRouter>
           <ThemeProvider>
@@ -70,7 +72,7 @@ export default function App() {
           </ThemeProvider>
         </BrowserRouter>
       </HelmetProvider>
-
+    </AdminContext.Provider>
     </MyUserContext.Provider>
   );
 }

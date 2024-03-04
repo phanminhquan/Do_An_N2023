@@ -17,7 +17,10 @@ export const endpoints = {
   station: '/api/datastation',
   checkemail: "/checkusername/",
   generateOTP :"/generateOtp",
-  validateOTP:'/validateOtp'
+  validateOTP:'/validateOtp',
+  adminLogin:"/admin-authenticate",
+  listUser :"/api/user/get0-all",
+  deletUser:"/api/user/delete"
 };
 export const authApi = () => {
   return axios.create({

@@ -2,9 +2,10 @@ package com.spring.iot.controllers;
 
 
 import com.spring.iot.entities.Station;
+import com.spring.iot.entities.User;
 import com.spring.iot.services.StationService;
+import com.spring.iot.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.cdi.Eager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +25,8 @@ public class StationController {
 
     @Autowired
     private StationService stationService;
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/data")
     @CrossOrigin
@@ -30,9 +34,12 @@ public class StationController {
         Map<String, Station> s = historyValue;
         return new ResponseEntity<>(historyValue, HttpStatus.OK);
     }
+
+
     @GetMapping("/api/history/{id}")
     @CrossOrigin
-    ResponseEntity <List<Station>> getHistoryStation (@PathVariable String id){
+    ResponseEntity <List<Station>> getHistoryStation (@PathVariable String id, Principal user){
+        User u = userService.findUserByEmail(user.getName());
         if(id.equals("station1"))
             return new ResponseEntity<>(historyStation1,HttpStatus.OK);
         else

@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -30,10 +32,13 @@ public class WebSecurityConfiguration {
                 .authorizeHttpRequests()
                 .requestMatchers("/authenticate", "/sign-up","/hello","/checkusername/",
                         "/ws/**","/expirationOfToken/**","/refreshtoken/**","/generateOtp"
-                        ,"/token-sign-up","/generateOtp","/validateOtp").permitAll()
+                        ,"/token-sign-up","/generateOtp","/validateOtp","/admin-authenticate").permitAll()
                 .and()
                 .authorizeHttpRequests().requestMatchers("/api/**","/data")
-                .authenticated().and()
+                .authenticated()
+                .and()
+                .authorizeHttpRequests().requestMatchers("/api/user/**").hasAnyAuthority("ADMIN")
+                .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
