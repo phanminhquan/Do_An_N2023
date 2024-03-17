@@ -1,8 +1,5 @@
 package com.spring.iot.dto;
 
-import com.spring.iot.entities.Main;
-import org.hibernate.dialect.function.MinMaxCaseEveryAnyEmulation;
-
 public class MainDTO {
     private Long id;
 

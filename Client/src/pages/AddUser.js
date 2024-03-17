@@ -10,20 +10,24 @@ import Apis, { endpoints } from '../configs/Apis';
 
 
 
-function EditUser() {
+function AddUser() {
     const path = useParams();
     const navigate = useNavigate();
     const [id, setID] = useState();
     const [name, setName] = useState();
     const [email, setEmail] = useState();
     const [role, setRole] = useState();
-    const [age, setAge] = useState();
+    const [password, setPassword] = useState();
+    const [showPassword, setShowPassword] = useState(false);
     const [refresh, setRefresh] = useState(false)
     const handleNameChange = (event) => {
         setName(event.target.value)
     }
     const handleEmailChange = (event) => {
         setEmail(event.target.value)
+    }
+    const handlePasswordChange = (event) => {
+        setPassword(event.target.value)
     }
     const handleChange = (event) => {
         setRole(event.target.value)
@@ -36,11 +40,11 @@ function EditUser() {
                 roleReq = "ADMIN"
             else
                 roleReq = "USER"
-            const res = await Apis.put(endpoints.editUser,
+            const res = await Apis.post(endpoints.createUser,
                 {
-                    "id": `${id}`,
                     "name": `${name}`,
                     "email": `${email}`,
+                    "password":`${password}`,
                     "role": `${roleReq}`
                 },
                 {
@@ -53,54 +57,45 @@ function EditUser() {
                 navigate("/admin/home")
             }
             
-                if (refresh) {
-                    setRefresh(false)
-                }
-                else {
-                    setRefresh(true)
-                }
-            
         };
         editUser();
     }
-
-
-
-    useEffect(() => {
-        const loaddata = async () => {
-            const res = await Apis.get(`${endpoints.getUser}/${path.id}`, {
-                headers: {
-                    Authorization: `Bearer ${cookie.load('token')}`,
-                },
-            });
-            setName(res.data.name)
-            setID(res.data.id)
-            setEmail(res.data.email)
-            if (res.data.role === "ADMIN") {
-                setRole(1)
-            }
-            else {
-                setRole(2)
-            }
-        };
-        loaddata();
-    }, [refresh])
     return (
         <Container maxWidth="sm">
 
             <Typography variant="h3" sx={{ px: 5, mt: 10, mb: 5 }}>
-                Thông tin người dùng
+                Thêm người dùng
             </Typography>
             <Stack spacing={3}>
-                <TextField id='id' name="id" label="ID" value={`${id}`} disabled />
-                <TextField id='name' name="name" label="Name" value={`${name}`} onChange={handleNameChange} />
-                <TextField type='email' id='email' name="email" label="Email address" value={`${email}`} onChange={handleEmailChange} />
+                
+                <TextField id='name' name="name" label="Name"  onChange={handleNameChange} required/>
+                <TextField type='email' id='email' name="email" label="Email address" onChange={handleEmailChange} required/>
+                <TextField
+                    id='password'
+                    name="password"
+                    label="Password"
+                    onChange={handlePasswordChange}
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                            <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                          </IconButton>
+                        </InputAdornment>
+
+                      ),
+                    }}
+                  />
+                
                 <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
-                    value={`${role}`}
                     label="Age"
                     onChange={handleChange}
+                    required
+                    value={"2"}
                 >
                     <MenuItem value={"1"}>Quản trị viên</MenuItem>
                     <MenuItem value={"2"}>Người dùng</MenuItem>
@@ -109,11 +104,11 @@ function EditUser() {
             </Stack>
             <br />
             <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleEdit} >
-                Edit
+                Add
             </LoadingButton>
 
         </Container>
     );
 }
 
-export default EditUser;
+export default AddUser;

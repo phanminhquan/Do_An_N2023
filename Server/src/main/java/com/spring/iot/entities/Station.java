@@ -1,10 +1,12 @@
 package com.spring.iot.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "station")
@@ -13,17 +15,25 @@ public class Station {
     @Id
     private String id;
 
-    private String dt;
+    private String name;
+    private Boolean active;
+
 
 //    private Boolean isActive;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "component_id", referencedColumnName = "id")
-    private Component components;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "main_id", referencedColumnName = "id")
-    private Main main;
+    public Station() {
+    }
+
+    public Station(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "station",fetch = FetchType.EAGER)
+    @JsonIgnore
+    private Set<Sensor> sensors;
+
 
     public String getId() {
         return id;
@@ -33,15 +43,8 @@ public class Station {
         this.id = id;
     }
 
-    public String getDt() {
-        return dt;
-    }
 
-    public void setDt(String dt) {
-        this.dt = dt;
-    }
-
-//    public Boolean getActive() {
+    //    public Boolean getActive() {
 //        return isActive;
 //    }
 //
@@ -49,19 +52,27 @@ public class Station {
 //        isActive = active;
 //    }
 
-    public Component getComponent() {
-        return components;
+    public String getName() {
+        return name;
     }
 
-    public void setComponent(Component component) {
-        this.components = component;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public Main getMain() {
-        return main;
+    public Set<Sensor> getSensors() {
+        return sensors;
     }
 
-    public void setMain(Main main) {
-        this.main = main;
+    public void setSensors(Set<Sensor> sensors) {
+        this.sensors = sensors;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 }

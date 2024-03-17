@@ -20,7 +20,10 @@ export const endpoints = {
   validateOTP:'/validateOtp',
   adminLogin:"/admin-authenticate",
   listUser :"/api/user/get0-all",
-  deletUser:"/api/user/delete"
+  deletUser:"/api/user/delete",
+  getUser:"/api/user",
+  editUser :"/api/user/edit-user",
+  createUser:"/api/user/create-user"
 };
 export const authApi = () => {
   return axios.create({

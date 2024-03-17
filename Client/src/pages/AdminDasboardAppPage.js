@@ -28,6 +28,7 @@ import {
   AppConversionRates,
 } from '../sections/@dashboard/app';
 import Expired from './Expired';
+import ExpiredAdmin from './ExpiredAdmin';
 
 
 
@@ -49,7 +50,7 @@ export default function AdminDashboardAppPage() {
   };
   console.log(user)
 
-
+  
   const listener = useGlobalState('message')[0];
 
 
@@ -95,8 +96,7 @@ export default function AdminDashboardAppPage() {
         }
         const onClick = (e) => {
           const currentRow = params.row;
-          
-          return alert(currentRow.id);
+          navigate(`/admin/user/${currentRow.id}`)
         };
 
         return (
@@ -142,7 +142,7 @@ export default function AdminDashboardAppPage() {
   if (isAuthorized === false) {
     return (
       <>
-        <Expired />
+        <ExpiredAdmin />
       </>
     );
   }
@@ -156,6 +156,9 @@ export default function AdminDashboardAppPage() {
       </Helmet>
 
       <Container maxWidth="xl">
+      <Button variant="contained" onClick={()=>{navigate("/admin/user/add")}}>
+              Add
+            </Button>
         <div style={{ height: 400, width: '100%' }}>
           <DataGrid
             rows={data}

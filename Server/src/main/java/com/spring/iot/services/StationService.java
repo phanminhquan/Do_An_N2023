@@ -26,6 +26,17 @@ public class StationService {
     public  List<Station> allListStaion(){
         return this.stationRepository.findAll();
     }
+    public void  setNonActiveForStation(List<Station> station){
+        List<Station> getAllStation = stationRepository.findAll();
+        for(Station s : station){
+            if(getAllStation.contains(s));
+                getAllStation.remove(s);
+        }
+        for(Station s: getAllStation){
+            s.setActive(false);
+        }
+        stationRepository.saveAll(getAllStation);
+    }
 
 
 }
