@@ -21,7 +21,7 @@ public class StationService {
         return stationRepository.findStationById(id);
     }
     public List<Station> getAllStation(){
-        return stationRepository.findAll();
+        return stationRepository.getStationsByActive(true);
     }
     public  List<Station> allListStaion(){
         return this.stationRepository.findAll();

@@ -7,30 +7,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Utils {
-    public static Map<String, Station> historyValue = new HashMap<String, Station>() {{
-        put("station1", null);
-        put("station2",null);
-        put("station3", null);
-        put("station4", null);
-        put("station5", null);
-    }};
-    public static ArrayList<Station> historyStation1 = new ArrayList<>();
-    public static ArrayList<Station> historyStation2 = new ArrayList<>();
-    public static ArrayList<Station> historyStation3 = new ArrayList<>();
-    public static ArrayList<Station> historyStation4 = new ArrayList<>();
-    public static ArrayList<Station> historyStation5 = new ArrayList<>();
+    public static ArrayList<Station> Station = new ArrayList<>();
 
-    public static ArrayList<Station> Station1 = new ArrayList<>();
-    public static ArrayList<Station> Station2 = new ArrayList<>();
-    public static ArrayList<Station> Station3 = new ArrayList<>();
-    public static ArrayList<Station> Station4 = new ArrayList<>();
-    public static ArrayList<Station> Station5 = new ArrayList<>();
+
+    public static Map<String, Station> historyValue = new HashMap<String, Station>() {{
+//        for (Station s: Station) {
+//            put(s.getName(),null);
+//        }
+        put("NBIOT 0002",null);
+    }};
     public static Map<String,Float> MinCO = new HashMap<>(){{
-        put("station1", 0f);
-        put("station2", 0f);
-        put("station3", 0f);
-        put("station4", 0f);
-        put("station5", 0f);
+        for (Station s: Station) {
+            put(s.getName(),0f);
+        }
     }};;
     public static Map<String, Float> MaxCO = new HashMap<>(){{
         put("station1", 0f);

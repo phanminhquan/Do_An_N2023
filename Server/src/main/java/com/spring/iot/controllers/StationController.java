@@ -1,41 +1,45 @@
-//package com.spring.iot.controllers;
-//
-//
-//import com.spring.iot.entities.Station;
-//import com.spring.iot.entities.User;
-//import com.spring.iot.services.StationService;
-//import com.spring.iot.services.UserService;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.http.HttpStatus;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.stereotype.Controller;
-//import org.springframework.web.bind.annotation.CrossOrigin;
-//import org.springframework.web.bind.annotation.GetMapping;
-//import org.springframework.web.bind.annotation.PathVariable;
-//
-//import java.security.Principal;
-//import java.util.HashMap;
-//import java.util.List;
-//import java.util.Map;
-//
-//import static com.spring.iot.util.Utils.*;
-//
-//@Controller
-//public class StationController {
-//
-//    @Autowired
-//    private StationService stationService;
-//    @Autowired
-//    private UserService userService;
-//
-//    @GetMapping("/data")
-//    @CrossOrigin
-//    ResponseEntity<Map<String, Station>> getdata(){
-//        Map<String, Station> s = historyValue;
-//        return new ResponseEntity<>(historyValue, HttpStatus.OK);
-//    }
-//
-//
+package com.spring.iot.controllers;
+
+
+import com.spring.iot.entities.SensorValue;
+import com.spring.iot.entities.Station;
+import com.spring.iot.entities.User;
+import com.spring.iot.services.SensorValueService;
+import com.spring.iot.services.StationService;
+import com.spring.iot.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import java.security.Principal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static com.spring.iot.util.Utils.*;
+
+@Controller
+public class StationController {
+
+    @Autowired
+    private StationService stationService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private SensorValueService sensorValueService;
+
+    @GetMapping("/data")
+    @CrossOrigin
+    ResponseEntity<Map<String, Station>> getdata(){
+        Map<String, Station> s = historyValue;
+        return new ResponseEntity<>(historyValue, HttpStatus.OK);
+    }
+
+
 //    @GetMapping("/api/history/{id}")
 //    @CrossOrigin
 //    ResponseEntity <List<Station>> getHistoryStation (@PathVariable String id, Principal user){
@@ -106,16 +110,42 @@
 //        return new ResponseEntity<>(res,HttpStatus.OK);
 //    }
 //
-//    @GetMapping("/api/all-staion")
-//    @CrossOrigin
-//    ResponseEntity<List<Station>> getAllStation(){
-//        return new ResponseEntity<>(stationService.getAllStation(),HttpStatus.OK);
-//    }
+    @GetMapping("/api/all-station")
+    @CrossOrigin
+    ResponseEntity<List<Station>> getAllStation(){
+        return new ResponseEntity<>(stationService.getAllStation(),HttpStatus.OK);
+    }
+    @GetMapping("/api/value-sensor/{nameStation}")
+    @CrossOrigin
+    ResponseEntity<List<SensorValue>> getvalueSensor(@PathVariable String nameStation){
+        return new ResponseEntity<>(sensorValueService.CurrentDataSensor(nameStation),HttpStatus.OK);
+    }
+
+    @GetMapping("/api/value-sensor-1h/{nameSensor}")
+    @CrossOrigin
+    ResponseEntity<List<SensorValue>> getvalueSensor1h(@PathVariable String nameSensor){
+        return new ResponseEntity<>(sensorValueService.DataSensorHour(nameSensor),HttpStatus.OK);
+    }
+    @GetMapping("/api/value-sensor-1d/{nameSensor}")
+    @CrossOrigin
+    ResponseEntity<List<SensorValue>> getvalueSensor1d(@PathVariable String nameSensor){
+        return new ResponseEntity<>(sensorValueService.DataSensorDay(nameSensor),HttpStatus.OK);
+    }
+    @GetMapping("/api/value-sensor-1w/{nameSensor}")
+    @CrossOrigin
+    ResponseEntity<List<SensorValue>> getvalueSensor1w(@PathVariable String nameSensor){
+        return new ResponseEntity<>(sensorValueService.DataSensorWeek(nameSensor),HttpStatus.OK);
+    }
+    @GetMapping("/api/value-sensor-1m/{nameSensor}")
+    @CrossOrigin
+    ResponseEntity<List<SensorValue>> getvalueSensor1m(@PathVariable String nameSensor){
+        return new ResponseEntity<>(sensorValueService.DataSensorMonth(nameSensor),HttpStatus.OK);
+    }
 //
 //    @GetMapping("/api/current/{id}")
 //    @CrossOrigin
 //    ResponseEntity<Station> currentStatusStation(@PathVariable String id){
 //        return  new ResponseEntity<>(stationService.findStattionByID(id),HttpStatus.OK);
 //    }
-//
-//}
+
+}

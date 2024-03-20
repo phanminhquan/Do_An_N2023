@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -32,7 +33,7 @@ public class Station {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "station",fetch = FetchType.EAGER)
     @JsonIgnore
-    private Set<Sensor> sensors;
+    private Set<Sensor> sensors = new HashSet<>();
 
 
     public String getId() {

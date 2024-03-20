@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -14,14 +15,14 @@ public class Sensor {
     private String id;
 
 
-    @JsonIgnore
+
     @ManyToOne
     @JoinColumn(name = "id_station")
     private Station station;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sensor",fetch = FetchType.LAZY)
     @JsonIgnore
-    private Set<SensorValue> sensorValues;
+    private Set<SensorValue> sensorValues = new HashSet<>();
 
 
 

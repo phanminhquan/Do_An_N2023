@@ -8,6 +8,5 @@ import java.util.List;
 
 public interface SensorRepository extends JpaRepository<Sensor, String> {
     Sensor findSensorById(String id);
-
-
+    List<Sensor> getSensorByStation_Id(String id);
 }

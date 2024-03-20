@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface StationRepository extends JpaRepository<Station,String> {
     Station findStationById(String id);
+    List<Station> getStationsByActive (Boolean active);
+
 }
