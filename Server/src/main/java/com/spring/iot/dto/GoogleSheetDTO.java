@@ -7,15 +7,9 @@ public class GoogleSheetDTO {
 
     private List<List<Object>> dataToBeUpdated;
 
-    private List<String> emails;
 
-    public List<String> getEmails() {
-        return emails;
-    }
 
-    public void setEmails(List<String> emails) {
-        this.emails = emails;
-    }
+
 
     public String getSheetName() {
         return sheetName;

@@ -21,6 +21,10 @@ import com.google.api.services.sheets.v4.model.*;
 
 import com.spring.iot.dto.GoogleSheetDTO;
 import com.spring.iot.dto.GoogleSheetResponseDTO;
+import com.spring.iot.entities.Station;
+import com.spring.iot.repositories.StationRepository;
+import org.hibernate.dialect.function.ListaggFunction;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
@@ -35,6 +39,8 @@ import java.util.*;
 public class SheetService {
 
 
+    @Autowired
+    private StationRepository stationRepository;
     private static final String APPLICATION_NAME = "Google Sheets API Java Quickstart";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens/path";
@@ -101,23 +107,34 @@ public class SheetService {
                 .setApplicationName(APPLICATION_NAME).build();
     }
 
-    public GoogleSheetResponseDTO createGoogleSheet(GoogleSheetDTO request)
+    public Boolean updateGoogleSheet()
             throws GeneralSecurityException, IOException {
+        String idSheet = "1mvJZiq-LscDEXL4hvo4IJNHHHXNhNXeD0KD9Y56Rmu4";
         Sheets service = getSheetService();
-        SpreadsheetProperties spreadsheetProperties = new SpreadsheetProperties();
-        spreadsheetProperties.setTitle(request.getSheetName());
-        SheetProperties sheetProperties = new SheetProperties();
-        sheetProperties.setTitle(request.getSheetName());
-        Sheet sheet = new Sheet().setProperties(sheetProperties);
-        Spreadsheet spreadsheet = new Spreadsheet().setProperties(spreadsheetProperties)
-                .setSheets(Collections.singletonList(sheet));
-        Spreadsheet createdResponse = service.spreadsheets().create(spreadsheet).execute();
-        final var googleSheetResponseDTO = new GoogleSheetResponseDTO();
-        ValueRange valueRange = new ValueRange().setValues(request.getDataToBeUpdated());
-        service.spreadsheets().values().update(createdResponse.getSpreadsheetId(), "A1", valueRange)
-                .setValueInputOption("RAW").execute();
-        googleSheetResponseDTO.setSpreadSheetId(createdResponse.getSpreadsheetId());
-        googleSheetResponseDTO.setSpeadSheetUrl(createdResponse.getSpreadsheetUrl());
-        return googleSheetResponseDTO;
+        try {
+            //Station
+            List<List<Object>> listStation = new ArrayList<>();
+            for (Station s : stationRepository.findAll()){
+                List<Object> objects = Arrays.asList(s.getId(),s.getName(),String.valueOf(s.getActive()));
+                listStation.add(objects);
+            }
+            ValueRange valueRangeStation = new ValueRange().setValues(listStation);
+            service.spreadsheets().values().update(idSheet, "A4", valueRangeStation)
+                    .setValueInputOption("RAW").execute();
+            //Value
+            List<List<Object>> listValue = new ArrayList<>();
+            for (List<Object> s : stationRepository.getListValue()){
+                List<Object> objects = Arrays.asList(s.get(0),s.get(1),s.get(2),s.get(3),String.valueOf(s.get(4)));
+                listValue.add(objects);
+            }
+            ValueRange valueRangeStationValue = new ValueRange().setValues(listValue);
+            service.spreadsheets().values().update(idSheet, "E4", valueRangeStationValue)
+                    .setValueInputOption("RAW").execute();
+            return true;
+        }
+        catch (Exception ex){
+            return false;
+        }
+
     }
 }

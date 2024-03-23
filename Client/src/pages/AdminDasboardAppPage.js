@@ -1,17 +1,19 @@
 import React, { useContext, useEffect, useState, Component } from 'react';
 
 import { Helmet } from 'react-helmet-async';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import cookie from 'react-cookies';
 // @mui
+import {  Form } from "react-bootstrap";
 import { useTheme } from '@mui/material/styles';
-import { Grid, Container, Typography, Button, Stack } from '@mui/material';
+import { Grid, Container, Typography, Button, Stack, TextField, listItemTextClasses } from '@mui/material';
 import CanvasJSReact from '@canvasjs/react-charts';
 import { toInteger } from 'lodash';
 import { DataGrid } from '@mui/x-data-grid';
 import Apis, { endpoints } from '../configs/Apis';
 import { setGlobalState, useGlobalState } from '..';
 import { AdminContext, MyUserContext } from '../App';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 // components
@@ -43,14 +45,24 @@ export default function AdminDashboardAppPage() {
   const [user, dispatch] = useContext(AdminContext);
   const [data, setData] = useState([]);
   const [refresh, setRefresh] = useState(false)
+  const [id, setid] = useState("");
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [role, setRole] = useState("");
   const theme = useTheme();
   const navigate = useNavigate();
+  const [q] = useSearchParams();
   const choose = (id) => {
     navigate(`/app/${id}`);
   };
   console.log(user)
 
-  
+  const search = (evt) => {
+    evt.preventDefault();
+    navigate(`/admin/home?id=${id}&name=${name}&role=${role}&email=${email}`)
+}
+
+
   const listener = useGlobalState('message')[0];
 
 
@@ -88,7 +100,7 @@ export default function AdminDashboardAppPage() {
                 setRefresh(true)
               }
             }
-            else{
+            else {
               alert(res.data)
             }
           }
@@ -119,7 +131,13 @@ export default function AdminDashboardAppPage() {
   };
   useEffect(() => {
     const loadUser = async () => {
-      const res = await Apis.get(endpoints.listUser, {
+  
+      const idParam = q.get("id")
+      const nameParam = q.get("name")
+      const emailParam = q.get("email")
+      const roleParam = q.get("role")  
+      const e =`${endpoints.listUser}?id=${idParam === null?"":idParam}&name=${nameParam === null ?"":nameParam}&role=${roleParam=== null?"":roleParam}&email=${emailParam=== null?"":emailParam}`
+      const res = await Apis.get(e, {
         headers: {
           Authorization: `Bearer ${cookie.load('token')}`,
         },
@@ -137,7 +155,7 @@ export default function AdminDashboardAppPage() {
       }
     }
     loadUser();
-  }, [refresh])
+  }, [refresh,q])
   //   if (user == null) return <Navigate to="/login" />;
   if (isAuthorized === false) {
     return (
@@ -156,9 +174,55 @@ export default function AdminDashboardAppPage() {
       </Helmet>
 
       <Container maxWidth="xl">
-      <Button variant="contained" onClick={()=>{navigate("/admin/user/add")}}>
-              Add
+        <Button variant="contained" onClick={() => { navigate("/admin/user/add") }}>
+          Add
+        </Button>
+        <br />
+        <br />
+        <Form onSubmit={search} inline>
+          <div className="d-flex flex-row mb-3 gap-5">
+            <div className="search">
+              <TextField
+                id="outlined-basic"
+                variant="outlined"
+                fullWidth
+                label="Id"
+                onChange={e => setid(e.target.value)}
+              />
+            </div>
+            <div className="search">
+              <TextField
+                id="outlined-basic"
+                variant="outlined"
+                fullWidth
+                label="Name"
+                onChange={e => setName(e.target.value)}
+              />
+            </div>
+            <div className="search">
+              <TextField
+                id="outlined-basic"
+                variant="outlined"
+                fullWidth
+                label="Email"
+                onChange={e => setEmail(e.target.value)}
+              />
+            </div>
+            <div className="search">
+              <TextField
+                id="outlined-basic"
+                variant="outlined"
+                fullWidth
+                label="Role"
+                onChange={e => setRole(e.target.value)}
+              />
+            </div>
+            <Button variant="contained" type="submit">
+              Search
             </Button>
+          </div>
+        </Form>
+
         <div style={{ height: 400, width: '100%' }}>
           <DataGrid
             rows={data}

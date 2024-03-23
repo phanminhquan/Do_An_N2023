@@ -145,8 +145,9 @@ public class MqttBeans {
                             sensorValueService.addOrUpdate(sensorValue);
                         }
                         stationService.setNonActiveForStation(listStationInJSON);
+                        sheetService.updateGoogleSheet();
                     }
-                }catch (JSONException | JsonProcessingException e){
+                }catch (JSONException | GeneralSecurityException | IOException e){
                     throw new RuntimeException(e);
                 }
 
