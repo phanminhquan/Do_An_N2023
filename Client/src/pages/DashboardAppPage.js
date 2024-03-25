@@ -694,7 +694,7 @@ export default function DashboardAppPage() {
               <Grid item xs={12} sm={6} md={3}>
                 <Link style={{ textDecoration: 'none' }} to={`/dashboard/info/${element.id}`}>
                   <AppWidgetSummary
-                    title={formatTitle(element.id)}
+                    title={element.name}
                     color="success"
                     icon={'ant-design:desktop-outlined'}
                   />
