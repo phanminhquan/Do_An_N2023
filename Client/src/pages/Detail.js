@@ -2,60 +2,114 @@ import cookie from 'react-cookies';
 import { useTheme } from '@mui/material/styles';
 import GaugeComponent from 'react-gauge-component';
 import { Col, Row, Table } from 'react-bootstrap';
+import { Flex } from '@chakra-ui/react';
 import React, { Component, useContext, useEffect, useState } from 'react';
 import CanvasJSReact from '@canvasjs/react-charts';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import { set, toInteger } from 'lodash';
-import {
-  MDBCard,
-  MDBCardBody,
-  MDBCol,
-  MDBContainer,
-  MDBIcon,
-  MDBRow,
-  MDBTypography,
-} from 'mdb-react-ui-kit';
+import { MDBCard, MDBCardBody, MDBCol, MDBContainer, MDBIcon, MDBRow, MDBTypography } from 'mdb-react-ui-kit';
 import Iconify from '../components/iconify';
 import { setGlobalState, useGlobalState } from '..';
 import Expired from './Expired';
 import Apis, { endpoints } from '../configs/Apis';
 import { MyUserContext } from '../App';
 
-
 const CanvasJS = CanvasJSReact.CanvasJS;
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
+const indexPage = {
+  backgroundColor: '#F0EEEE',
+  padding: '10px',
+};
+const station = {
+  display: 'flex',
+  justifyContent: 'space-around',
+};
+const stationBanner = {
+  backgroundColor: '#FFFFFF',
+  width: '35%',
+  height: '100px',
+  display: 'flex',
+  justifyContent: 'space-between',
+  padding: '10px',
+};
+const stationInfor = {
+  backgroundColor: '#CCFFFF',
+  width: '30%',
+  height: '100px',
+  display: 'flex',
+  justifyContent: 'center',
+  fontSize: '25px',
+  alignItems: 'center',
+  boxShadow: '5px 5px 10px 0 rgba(0, 0, 0, 0.1)',
+};
+const styles = {
+  headerCell: {
+    backgroundColor: '#ffffff',
+    border: '1px solid #ddd',
+    padding: '8px',
+    textAlign: 'left',
+  },
+  dataCell: {
+    border: '1px solid #ddd',
+    padding: '8px',
+    textAlign: 'center',
+  },
+};
+const indexSensor = {
+  width: '100%',
+  height: '150px',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+};
+const childSensor = {
+  width: '25%',
+  height: '150px',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+};
+const disable = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="60"
+    height="30"
+    color="blue"
+    fill="currentColor"
+    className="bi bi-toggle-off"
+    viewBox="0 0 16 16"
+  >
+    <path d="M11 4a4 4 0 0 1 0 8H8a5 5 0 0 0 2-4 5 5 0 0 0-2-4zm-6 8a4 4 0 1 1 0-8 4 4 0 0 1 0 8M0 8a5 5 0 0 0 5 5h6a5 5 0 0 0 0-10H5a5 5 0 0 0-5 5" />
+  </svg>
+);
+const enable = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="60"
+    color="blue"
+    height="30"
+    fill="currentColor"
+    className="bi bi-toggle-on"
+    viewBox="0 0 16 16"
+  >
+    <path d="M5 3a5 5 0 0 0 0 10h6a5 5 0 0 0 0-10zm6 9a4 4 0 1 1 0-8 4 4 0 0 1 0 8" />
+  </svg>
+);
 
 export default function Detail() {
+  const [childValue, setChildValue] = useState(1);
+  const [indexValue, setIndexValue] = useState(1);
+
+  // Hàm xử lý sự kiện khi nhấp chuột vào childSensor
+  const handleChildClick = () => {
+    // Cập nhật giá trị của indexSensor thành giá trị của childSensor
+    setIndexValue(childValue);
+  };
   const [user, dispatch] = useContext(MyUserContext);
 
   const path = useParams();
   const [data, setData] = useState();
-  const [dataCo, setDataCo] = useState([]);
-  const [dataNO, setDataNo] = useState([]);
-  const [dataNO2, setDataNO2] = useState([]);
-  const [dataO3, setDataO3] = useState([]);
-  const [dataSO2, setDataSO2] = useState([]);
-  const [dataPM25, setDataPM25] = useState([]);
-  const [dataPM10, setDataPM10] = useState([]);
-  const [dataNH3, setDataNH3] = useState([]);
-  const [minCo, setMinCo] = useState();
-  const [maxCo, setMaxCo] = useState();
-  const [minNO, setMinNO] = useState();
-  const [maxNO, setMaxNO] = useState();
-  const [minNO2, setMinNO2] = useState();
-  const [maxNO2, setMaxNO2] = useState();
-  const [minO3, setMinO3] = useState();
-  const [maxO3, setMaxO3] = useState();
-  const [minSO2, setMinSO2] = useState();
-  const [maxSO2, setMaxSO2] = useState();
-  const [minPm25, setMinPm25] = useState();
-  const [maxPm25, setMaxPm25] = useState();
-  const [minPm10, setMinPm10] = useState();
-  const [maxPm10, setMaxPm10] = useState();
-  const [minNH3, setMinNH3] = useState();
-  const [maxNH3, setMaxNH3] = useState();
-
   const listener = useGlobalState('message')[0];
   useEffect(() => {
     const loaddata = async () => {
@@ -64,59 +118,16 @@ export default function Detail() {
           Authorization: `Bearer ${cookie.load('token')}`,
         },
       });
-      console.log(res)
+      console.log(res);
       if (res.data === '') {
         setGlobalState('isAuthorized', false);
-
       } else {
         setData(res.data);
       }
-      console.log(data)
+      console.log(data);
     };
     loaddata();
   }, [listener]);
-  // const options = {
-  //   animationEnabled: true,
-  //   theme: 'light2',
-  //   title: {
-  //     text: 'Dữ liệu CO trong 1 giờ qua',
-  //   },
-  //   axisX: {
-  //     valueFormatString: 'DD/MM/YYYY HH:mm:ss',
-  //     crosshair: {
-  //       enabled: true,
-  //       snapToDataPoint: true,
-  //     },
-  //   },
-  //   axisY: {
-  //     title: 'µg/m³',
-  //     includeZero: true,
-  //     crosshair: {
-  //       enabled: true,
-  //     },
-  //   },
-  //   toolTip: {
-  //     shared: true,
-  //   },
-  //   legend: {
-  //     cursor: 'pointer',
-  //     verticalAlign: 'bottom',
-  //     horizontalAlign: 'left',
-  //     dockInsidePlotArea: true,
-  //   },
-  //   data: [
-  //     {
-  //       type: 'line',
-  //       showInLegend: true,
-  //       name: 'CO',
-  //       markerType: 'square',
-  //       xValueFormatString: 'DD/MM/YYYY HH:mm:ss',
-  //       color: '#F08080',
-  //       dataPoints: dataCo,
-  //     },
-  //   ],
-  // };
-
   const isAuthorized = useGlobalState('isAuthorized')[0];
   if (isAuthorized === false || user == null) {
     return (
@@ -125,358 +136,274 @@ export default function Detail() {
       </>
     );
   }
-  if (data == null) return (<></>)
+  if (data == null) return <></>;
   return (
     <>
-      <div className="container">
-        <h1 className='text-center'>Dữ liệu các máy cảm biến của trạm {path.id}</h1>
-        <MDBCardBody className="p-4">
-          <section className="vh-100 " style={{ backgroundColor: "#C1CFEA" }}>
-            {/* <MDBContainer className="h-100"> */}
-            <MDBRow
-              className="ps-2 align-items-center h-100"
-              style={{ color: "#282828" }}
+      <div className="indexPage" style={indexPage}>
+        <div className="Banner" style={station}>
+          <div className="StationInfor" style={(stationBanner, stationInfor)}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              className="bi bi-houses"
+              viewBox="0 0 16 16"
             >
-              <MDBCol className='col-sm-4'>
-                <MDBCard
-                  className="mb-4 gradient-custom"
-                  style={{ borderRadius: "25px" }}
+              <path d="M5.793 1a1 1 0 0 1 1.414 0l.647.646a.5.5 0 1 1-.708.708L6.5 1.707 2 6.207V12.5a.5.5 0 0 0 .5.5.5.5 0 0 1 0 1A1.5 1.5 0 0 1 1 12.5V7.207l-.146.147a.5.5 0 0 1-.708-.708zm3 1a1 1 0 0 1 1.414 0L12 3.793V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v3.293l1.854 1.853a.5.5 0 0 1-.708.708L15 8.207V13.5a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 4 13.5V8.207l-.146.147a.5.5 0 1 1-.708-.708zm.707.707L5 7.207V13.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5V7.207z" />
+            </svg>
+            NBIOT 0002
+          </div>
+          <div className="StationClock" style={(stationBanner, stationInfor)}>
+            <iframe
+              scrolling="no"
+              frameBorder="no"
+              title="clock"
+              style={{
+                overflow: 'hidden',
+                border: '0',
+                margin: '0',
+                padding: '0',
+                width: '120px',
+                height: '40px',
+              }}
+              src="https://www.clocklink.com/html5embed.php?clock=004&timezone=GMT0700&color=blue&size=120&Title=&Message=&Target=&From=2024,1,1,0,0,0&Color=blue"
+            />
+          </div>
+          <div className="StationStage" style={stationBanner}>
+            <div>
+              <div>Relay 0001{enable}</div>
+              <div style={{ marginTop: '10px' }}>Relay 0002{disable}</div>
+            </div>
+            <div>
+              <div>Relay 0003{disable}</div>
+              <div style={{ marginTop: '10px' }}>Relay 0004{disable}</div>
+            </div>
+          </div>
+        </div>
+        <div className="SenSorInfor" style={{ backgroundColor: '#ffffff', marginTop: '20px', marginLeft: '8px' }}>
+          <div className="indexSensor" style={indexSensor}>
+            <div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="100"
+                height="100"
+                fill="currentColor"
+                className="bi bi-thermometer-sun"
+                viewBox="0 0 16 16"
+              >
+                <path d="M5 12.5a1.5 1.5 0 1 1-2-1.415V2.5a.5.5 0 0 1 1 0v8.585A1.5 1.5 0 0 1 5 12.5" />
+                <path d="M1 2.5a2.5 2.5 0 0 1 5 0v7.55a3.5 3.5 0 1 1-5 0zM3.5 1A1.5 1.5 0 0 0 2 2.5v7.987l-.167.15a2.5 2.5 0 1 0 3.333 0L5 10.486V2.5A1.5 1.5 0 0 0 3.5 1m5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1a.5.5 0 0 1 .5-.5m4.243 1.757a.5.5 0 0 1 0 .707l-.707.708a.5.5 0 1 1-.708-.708l.708-.707a.5.5 0 0 1 .707 0M8 5.5a.5.5 0 0 1 .5-.5 3 3 0 1 1 0 6 .5.5 0 0 1 0-1 2 2 0 0 0 0-4 .5.5 0 0 1-.5-.5M12.5 8a.5.5 0 0 1 .5-.5h1a.5.5 0 1 1 0 1h-1a.5.5 0 0 1-.5-.5m-1.172 2.828a.5.5 0 0 1 .708 0l.707.708a.5.5 0 0 1-.707.707l-.708-.707a.5.5 0 0 1 0-.708M8.5 12a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1a.5.5 0 0 1 .5-.5" />
+              </svg>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <h5>nhiệt độ</h5>
+              <div>{indexValue}</div>
+            </div>
+          </div>
+          <div className="ortherSensor" style={{ display: 'flex', flexWrap: 'wrap', cursor: 'pointer' }}>
+            <div className="childSensor" style={childSensor} tabIndex={handleChildClick}>
+              <div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="50"
+                  height="50"
+                  fill="currentColor"
+                  className="bi bi-thermometer-sun"
+                  viewBox="0 0 16 16"
                 >
-                  <MDBCardBody className="p-4">
-                    <div className="d-flex justify-content-between pb-2">
-                      <div>
-                        <h2 className="display-2">
-                          <strong>23°C</strong>
-                        </h2>
-                        <p className="text-muted mb-0">Nhiệt độ của đất</p>
-                      </div>
-                      <div>
-                        <img
-                          src="https://res.cloudinary.com/dexbjwfjg/image/upload/v1711286895/NhietKe_pvcjdl.jpg"
-                          width="150px"
-                          alt='img'
-                          style={{ borderRadius: '10%' }}
-                        />
-                      </div>
-                    </div>
-                  </MDBCardBody>
-                </MDBCard>
-                <MDBCard
-                  className="mb-4 gradient-custom"
-                  style={{ borderRadius: "25px" }}
+                  <path d="M5 12.5a1.5 1.5 0 1 1-2-1.415V2.5a.5.5 0 0 1 1 0v8.585A1.5 1.5 0 0 1 5 12.5" />
+                  <path d="M1 2.5a2.5 2.5 0 0 1 5 0v7.55a3.5 3.5 0 1 1-5 0zM3.5 1A1.5 1.5 0 0 0 2 2.5v7.987l-.167.15a2.5 2.5 0 1 0 3.333 0L5 10.486V2.5A1.5 1.5 0 0 0 3.5 1m5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1a.5.5 0 0 1 .5-.5m4.243 1.757a.5.5 0 0 1 0 .707l-.707.708a.5.5 0 1 1-.708-.708l.708-.707a.5.5 0 0 1 .707 0M8 5.5a.5.5 0 0 1 .5-.5 3 3 0 1 1 0 6 .5.5 0 0 1 0-1 2 2 0 0 0 0-4 .5.5 0 0 1-.5-.5M12.5 8a.5.5 0 0 1 .5-.5h1a.5.5 0 1 1 0 1h-1a.5.5 0 0 1-.5-.5m-1.172 2.828a.5.5 0 0 1 .708 0l.707.708a.5.5 0 0 1-.707.707l-.708-.707a.5.5 0 0 1 0-.708M8.5 12a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1a.5.5 0 0 1 .5-.5" />
+                </svg>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <h5>nhiệt độ 1</h5>
+                <div>{childValue}</div>
+              </div>
+            </div>
+            <div className="childSensor" style={childSensor}>
+              <div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="50"
+                  height="50"
+                  fill="currentColor"
+                  className="bi bi-thermometer-sun"
+                  viewBox="0 0 16 16"
                 >
-                  <MDBCardBody className="p-4">
-                    <div className="d-flex justify-content-between pb-2">
-                      <div>
-                        <h2 className="display-2">
-                          <strong>23°C</strong>
-                        </h2>
-                        <p className="text-muted mb-0">Nhiệt độ của đất</p>
-                      </div>
-                      <div>
-                        <img
-                          src="https://res.cloudinary.com/dexbjwfjg/image/upload/v1711286895/NhietKe_pvcjdl.jpg"
-                          width="150px"
-                          alt='img'
-                          style={{ borderRadius: '10%' }}
-                        />
-                      </div>
-                    </div>
-                  </MDBCardBody>
-                </MDBCard>
-
-                <MDBCard className="mb-4" style={{ borderRadius: "25px" }}>
-                  <MDBCardBody className="p-4">
-                    <div className="d-flex justify-content-around text-center pb-3 pt-2">
-                      <div className="flex-column">
-                        <p className="small">
-                          <strong>21°C</strong>
-                        </p>
-                        <MDBIcon
-                          fas
-                          icon="sun"
-                          size="2x"
-                          className="mb-3"
-                          style={{ color: "#ddd" }}
-                        />
-                        <p className="mb-0">
-                          <strong>12:00</strong>
-                        </p>
-                        <p
-                          className="mb-0 text-muted"
-                          style={{ fontSize: ".65rem" }}
-                        >
-                          PM
-                        </p>
-                      </div>
-                      <div className="flex-column">
-                        <p className="small">
-                          <strong>2°C</strong>
-                        </p>
-                        <MDBIcon
-                          fas
-                          icon="sun"
-                          size="2x"
-                          className="mb-3"
-                          style={{ color: "#ddd" }}
-                        />
-                        <p className="mb-0">
-                          <strong>1:00</strong>
-                        </p>
-                        <p
-                          className="mb-0 text-muted"
-                          style={{ fontSize: ".65rem" }}
-                        >
-                          PM
-                        </p>
-                      </div>
-                      <div className="flex-column">
-                        <p className="small">
-                          <strong>20°C</strong>
-                        </p>
-                        <MDBIcon
-                          fas
-                          icon="cloud"
-                          size="2x"
-                          className="mb-3"
-                          style={{ color: "#ddd" }}
-                        />
-                        <p className="mb-0">
-                          <strong>2:00</strong>
-                        </p>
-                        <p
-                          className="mb-0 text-muted"
-                          style={{ fontSize: ".65rem" }}
-                        >
-                          PM
-                        </p>
-                      </div>
-                      <div className="flex-column">
-                        <p className="small">
-                          <strong>19°C</strong>
-                        </p>
-                        <MDBIcon
-                          fas
-                          icon="cloud"
-                          size="2x"
-                          className="mb-3"
-                          style={{ color: "#ddd" }}
-                        />
-                        <p className="mb-0">
-                          <strong>3:00</strong>
-                        </p>
-                        <p
-                          className="mb-0 text-muted"
-                          style={{ fontSize: ".65rem" }}
-                        >
-                          PM
-                        </p>
-                      </div>
-                      <div className="flex-column">
-                        <p className="small">
-                          <strong>18°C</strong>
-                        </p>
-                        <MDBIcon
-                          fas
-                          icon="cloud-showers-heavy"
-                          size="2x"
-                          className="mb-3"
-                          style={{ color: "#ddd" }}
-                        />
-                        <p className="mb-0">
-                          <strong>4:00</strong>
-                        </p>
-                        <p
-                          className="mb-0 text-muted"
-                          style={{ fontSize: ".65rem" }}
-                        >
-                          PM
-                        </p>
-                      </div>
-                    </div>
-                  </MDBCardBody>
-                </MDBCard>
-
-
-                <MDBCard className="mb-4" style={{ borderRadius: "25px" }}>
-                  <MDBCardBody className="p-4">
-                    <div className="d-flex justify-content-around text-center pb-3 pt-2">
-                      <div className="flex-column">
-                        <p className="small">
-                          <strong>21°C</strong>
-                        </p>
-                        <MDBIcon
-                          fas
-                          icon="sun"
-                          size="2x"
-                          className="mb-3"
-                          style={{ color: "#ddd" }}
-                        />
-                        <p className="mb-0">
-                          <strong>Mon</strong>
-                        </p>
-                      </div>
-                      <div className="flex-column">
-                        <p className="small">
-                          <strong>20°C</strong>
-                        </p>
-                        <MDBIcon
-                          fas
-                          icon="sun"
-                          size="2x"
-                          className="mb-3"
-                          style={{ color: "#ddd" }}
-                        />
-                        <p className="mb-0">
-                          <strong>Tue</strong>
-                        </p>
-                      </div>
-                      <div className="flex-column">
-                        <p className="small">
-                          <strong>16°C</strong>
-                        </p>
-                        <MDBIcon
-                          fas
-                          icon="cloud"
-                          size="2x"
-                          className="mb-3"
-                          style={{ color: "#ddd" }}
-                        />
-                        <p className="mb-0">
-                          <strong>Wed</strong>
-                        </p>
-                      </div>
-                      <div className="flex-column">
-                        <p className="small">
-                          <strong>17°C</strong>
-                        </p>
-                        <MDBIcon
-                          fas
-                          icon="cloud"
-                          size="2x"
-                          className="mb-3"
-                          style={{ color: "#ddd" }}
-                        />
-                        <p className="mb-0">
-                          <strong>Thu</strong>
-                        </p>
-                      </div>
-                      <div className="flex-column">
-                        <p className="small">
-                          <strong>18°C</strong>
-                        </p>
-                        <MDBIcon
-                          fas
-                          icon="cloud-showers-heavy"
-                          size="2x"
-                          className="mb-3"
-                          style={{ color: "#ddd" }}
-                        />
-                        <p className="mb-0">
-                          <strong>Fri</strong>
-                        </p>
-                      </div>
-                    </div>
-                  </MDBCardBody>
-                </MDBCard>
-              </MDBCol>
-              <MDBCol className='col-sm-8'>
-                <Row>
-                  {data.map((element) => {
-                    console.log(element.value)
-                    return (
-                      <Col xs={12} md={6} className="mt-2 mb-2">
-                        {' '}
-                        CO (carbon monoxide)
-                        <GaugeComponent
-                          type="semicircle"
-                          style={{ width: `300px`, height: `150px` }}
-                          arc={{
-                            width: 0.1,
-                            padding: 0.0005,
-                            cornerRadius: 1,
-                            // gradient: true,
-                            subArcs: [
-                              {
-                                limit: 1000,
-                                color: '#5BE12C',
-                                showTick: true,
-                                tooltip: {
-                                  text: 'Nồng độ an toàn',
-                                },
-                              },
-                              {
-                                limit: 2000,
-                                color: '#b9dd2d',
-                                showTick: true,
-                                tooltip: {
-                                  text: 'Nồng độ chấp nhận',
-                                },
-                              },
-                              {
-                                limit: 10000,
-                                color: '#F5CD19',
-                                showTick: true,
-                                tooltip: {
-                                  text: 'Ngưỡng độc tính',
-                                },
-                              },
-                              {
-                                color: '#EA4228',
-                                tooltip: {
-                                  text: 'Ngưỡng gây tử vong',
-                                },
-                              },
-                            ],
-                          }}
-                          pointer={{
-                            color: '#E0E0E0',
-                            length: 0.8,
-                            width: 15,
-                            // elastic: true,
-                          }}
-                          labels={{
-                            valueLabel: {
-                              formatTextValue: (value) => `${value}µg/m³`,
-                              style: {
-                                fill: `#000000`,
-                              },
-                            },
-                            tickLabels: {
-                              type: 'outer',
-                              defaultTickValueConfig: {
-                                formatTextValue: (value) => `${value}`,
-                                style: {
-                                  fill: `#000000`,
-                                  textShadow: ``,
-                                },
-                              },
-                              ticks: [{ value: 0 }],
-                            },
-                          }}
-                          value={element.value}
-                          minValue={0}
-                          maxValue={20000}
-                        />
-                      </Col>
-                    );
-                  })}
-                </Row>
-              </MDBCol>
-            </MDBRow>
-
-            {/* </MDBContainer> */}
-          </section>
-        </MDBCardBody>
-
-
+                  <path d="M5 12.5a1.5 1.5 0 1 1-2-1.415V2.5a.5.5 0 0 1 1 0v8.585A1.5 1.5 0 0 1 5 12.5" />
+                  <path d="M1 2.5a2.5 2.5 0 0 1 5 0v7.55a3.5 3.5 0 1 1-5 0zM3.5 1A1.5 1.5 0 0 0 2 2.5v7.987l-.167.15a2.5 2.5 0 1 0 3.333 0L5 10.486V2.5A1.5 1.5 0 0 0 3.5 1m5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1a.5.5 0 0 1 .5-.5m4.243 1.757a.5.5 0 0 1 0 .707l-.707.708a.5.5 0 1 1-.708-.708l.708-.707a.5.5 0 0 1 .707 0M8 5.5a.5.5 0 0 1 .5-.5 3 3 0 1 1 0 6 .5.5 0 0 1 0-1 2 2 0 0 0 0-4 .5.5 0 0 1-.5-.5M12.5 8a.5.5 0 0 1 .5-.5h1a.5.5 0 1 1 0 1h-1a.5.5 0 0 1-.5-.5m-1.172 2.828a.5.5 0 0 1 .708 0l.707.708a.5.5 0 0 1-.707.707l-.708-.707a.5.5 0 0 1 0-.708M8.5 12a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1a.5.5 0 0 1 .5-.5" />
+                </svg>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <h5>nhiệt độ 2</h5>
+                <div>2</div>
+              </div>
+            </div>
+            <div className="childSensor" style={childSensor}>
+              <div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="50"
+                  height="50"
+                  fill="currentColor"
+                  className="bi bi-droplet-half"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M7.21.8C7.69.295 8 0 8 0q.164.544.371 1.038c.812 1.946 2.073 3.35 3.197 4.6C12.878 7.096 14 8.345 14 10a6 6 0 0 1-12 0C2 6.668 5.58 2.517 7.21.8m.413 1.021A31 31 0 0 0 5.794 3.99c-.726.95-1.436 2.008-1.96 3.07C3.304 8.133 3 9.138 3 10c0 0 2.5 1.5 5 .5s5-.5 5-.5c0-1.201-.796-2.157-2.181-3.7l-.03-.032C9.75 5.11 8.5 3.72 7.623 1.82z"
+                  />
+                  <path
+                    fillRule="evenodd"
+                    d="M4.553 7.776c.82-1.641 1.717-2.753 2.093-3.13l.708.708c-.29.29-1.128 1.311-1.907 2.87z"
+                  />
+                </svg>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <h5>Độ ẩm 1</h5>
+                <div>2</div>
+              </div>
+            </div>
+            <div className="childSensor" style={childSensor}>
+              <div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="50"
+                  height="50"
+                  fill="currentColor"
+                  className="bi bi-droplet-half"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M7.21.8C7.69.295 8 0 8 0q.164.544.371 1.038c.812 1.946 2.073 3.35 3.197 4.6C12.878 7.096 14 8.345 14 10a6 6 0 0 1-12 0C2 6.668 5.58 2.517 7.21.8m.413 1.021A31 31 0 0 0 5.794 3.99c-.726.95-1.436 2.008-1.96 3.07C3.304 8.133 3 9.138 3 10c0 0 2.5 1.5 5 .5s5-.5 5-.5c0-1.201-.796-2.157-2.181-3.7l-.03-.032C9.75 5.11 8.5 3.72 7.623 1.82z"
+                  />
+                  <path
+                    fillRule="evenodd"
+                    d="M4.553 7.776c.82-1.641 1.717-2.753 2.093-3.13l.708.708c-.29.29-1.128 1.311-1.907 2.87z"
+                  />
+                </svg>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <h5>Độ ẩm 2</h5>
+                <div>2</div>
+              </div>
+            </div>
+            <div className="childSensor" style={childSensor}>
+              <div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="50"
+                  height="50"
+                  fill="currentColor"
+                  className="bi bi-moisture"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M13.5 0a.5.5 0 0 0 0 1H15v2.75h-.5a.5.5 0 0 0 0 1h.5V7.5h-1.5a.5.5 0 0 0 0 1H15v2.75h-.5a.5.5 0 0 0 0 1h.5V15h-1.5a.5.5 0 0 0 0 1h2a.5.5 0 0 0 .5-.5V.5a.5.5 0 0 0-.5-.5zM7 1.5l.364-.343a.5.5 0 0 0-.728 0l-.002.002-.006.007-.022.023-.08.088a29 29 0 0 0-1.274 1.517c-.769.983-1.714 2.325-2.385 3.727C2.368 7.564 2 8.682 2 9.733 2 12.614 4.212 15 7 15s5-2.386 5-5.267c0-1.05-.368-2.169-.867-3.212-.671-1.402-1.616-2.744-2.385-3.727a29 29 0 0 0-1.354-1.605l-.022-.023-.006-.007-.002-.001zm0 0-.364-.343zm-.016.766L7 2.247l.016.019c.24.274.572.667.944 1.144.611.781 1.32 1.776 1.901 2.827H4.14c.58-1.051 1.29-2.046 1.9-2.827.373-.477.706-.87.945-1.144zM3 9.733c0-.755.244-1.612.638-2.496h6.724c.395.884.638 1.741.638 2.496C11 12.117 9.182 14 7 14s-4-1.883-4-4.267" />
+                </svg>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <h5>Độ PH</h5>
+                <div>2</div>
+              </div>
+            </div>
+            <div className="childSensor" style={childSensor}>
+              <div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="50"
+                  height="50"
+                  fill="currentColor"
+                  className="bi bi-fire"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M8 16c3.314 0 6-2 6-5.5 0-1.5-.5-4-2.5-6 .25 1.5-1.25 2-1.25 2C11 4 9 .5 6 0c.357 2 .5 4-2 6-1.25 1-2 2.729-2 4.5C2 14 4.686 16 8 16m0-1c-1.657 0-3-1-3-2.75 0-.75.25-2 1.25-3C6.125 10 7 10.5 7 10.5c-.375-1.25.5-3.25 2-3.5-.179 1-.25 2 1 3 .625.5 1 1.364 1 2.25C11 14 9.657 15 8 15" />
+                </svg>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <h5>Độ dẫn nhiệt</h5>
+                <div>2</div>
+              </div>
+            </div>
+            <div className="childSensor" style={childSensor}>
+              <div>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" width="50" height="50">
+                  <path d="M311 86.3c12.3-12.7 12-32.9-.7-45.2s-32.9-12-45.2 .7l-155.2 160L64 249V64c0-17.7-14.3-32-32-32S0 46.3 0 64V328 448c0 17.7 14.3 32 32 32s32-14.3 32-32V341l64.7-66.7 133 192c10.1 14.5 30 18.1 44.5 8.1s18.1-30 8.1-44.5L174.1 227.4 311 86.3z" />
+                </svg>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <h5>Kali</h5>
+                <div>2</div>
+              </div>
+            </div>
+            <div className="childSensor" style={childSensor}>
+              <div>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="50" height="50">
+                  <path d="M21.1 33.9c12.7-4.6 26.9-.7 35.5 9.6L320 359.6V64c0-17.7 14.3-32 32-32s32 14.3 32 32V448c0 13.5-8.4 25.5-21.1 30.1s-26.9 .7-35.5-9.6L64 152.4V448c0 17.7-14.3 32-32 32s-32-14.3-32-32V64C0 50.5 8.4 38.5 21.1 33.9z" />
+                </svg>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <h5>Nito</h5>
+                <div>2</div>
+              </div>
+            </div>
+            <div className="childSensor" style={childSensor}>
+              <div>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" width="50" height="50">
+                  <path d="M0 96C0 60.7 28.7 32 64 32h96c88.4 0 160 71.6 160 160s-71.6 160-160 160H64v96c0 17.7-14.3 32-32 32s-32-14.3-32-32V320 96zM64 288h96c53 0 96-43 96-96s-43-96-96-96H64V288z" />
+                </svg>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <h5>Photpho</h5>
+                <div>2</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="MinMaxSensor" style={{ marginTop: '20px', marginLeft: '8px' }}>
+          <select
+            style={{ width: '30%', height: '25px', border: '0.2px', boxShadow: '5px 5px 10px 0 rgba(0, 0, 0, 0.1)' }}
+          >
+            <option value="temp_0001">temp_0001</option>
+            <option value="temp_0002">temp_0002</option>
+            <option value="humi_0001">humi_0001</option>
+            <option value="humi_0002">humi_0002</option>
+            <option value="ph_0002">ph_0002</option>
+            <option value="EC_0002">EC_0002</option>
+            <option value="Nito_0002">Nito_0002</option>
+            <option value="Photpho_0002">Photpho_0002</option>
+            <option value="Kali_0002">Kali_0002</option>
+          </select>
+          <table style={{ borderCollapse: 'collapse', width: '100%', marginTop: '5px', backgroundColor: '#ffffff' }}>
+            <thead>
+              <tr>
+                <th style={styles.headerCell}> </th>
+                <th style={styles.headerCell}>Trong vòng 1 giờ qua</th>
+                <th style={styles.headerCell}>Trong vòng 1 ngày qua</th>
+                <th style={styles.headerCell}>Trong vòng 1 tuần qua</th>
+                <th style={styles.headerCell}>Trong vòng 1 tháng qua</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style={styles.dataCell}>Giá trị lớn nhất</td>
+                <td style={styles.dataCell}>asd</td>
+                <td style={styles.dataCell}>asd</td>
+                <td style={styles.dataCell}>asd</td>
+                <td style={styles.dataCell}>asd</td>
+              </tr>
+              <tr>
+                <td style={styles.dataCell}>Giá trị nhỏ nhất</td>
+                <td style={styles.dataCell}>asd</td>
+                <td style={styles.dataCell}>asd</td>
+                <td style={styles.dataCell}>asd</td>
+                <td style={styles.dataCell}>asd</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      {/* <div style={{ width: `calc(100% / ${1})`, height: 50 }}> </div>
-     
-      <div style={{ width: `calc(100% / ${1})`, height: 50 }}> </div>
-     
-      <div style={{ width: `calc(100% / ${1})`, height: 50 }}> </div> */}
-
     </>
   );
 }
