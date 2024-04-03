@@ -24,7 +24,9 @@ export const endpoints = {
   getUser:"/api/user",
   editUser :"/api/user/edit-user",
   createUser:"/api/user/create-user",
-  stationInfo:"/api/staion-info"
+  stationInfo:"/api/staion-info",
+  listSensor: "http://localhost:9000/api/station/sensor"
+
 };
 export const authApi = () => {
   return axios.create({

@@ -44,6 +44,16 @@ public class SensorValueService {
         }
         return list;
     }
+
+    public List<SensorValue> getCurrentListOfRelay(String station, String value){
+        List<SensorValue> arr = new ArrayList<>();
+        for(SensorValue s: this.CurrentDataSensor(station)){
+            if(s.getSensor().getId().split("_")[0].equals(value)){
+                arr.add(s);
+            }
+        }
+        return arr;
+    }
     public List<SensorValue> DataSensorHour (String idsensor)
     {
         List<SensorValue> newlist = new ArrayList<>();
