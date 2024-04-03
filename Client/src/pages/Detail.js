@@ -9,11 +9,13 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import { set, toInteger } from 'lodash';
 import { MDBCard, MDBCardBody, MDBCol, MDBContainer, MDBIcon, MDBRow, MDBTypography } from 'mdb-react-ui-kit';
-import Iconify from '../components/iconify';
+import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { setGlobalState, useGlobalState } from '..';
 import Expired from './Expired';
 import Apis, { endpoints } from '../configs/Apis';
 import { MyUserContext } from '../App';
+
+
 
 const CanvasJS = CanvasJSReact.CanvasJS;
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
@@ -105,13 +107,56 @@ export default function Detail() {
   const handleChildClick = () => {
     // Cập nhật giá trị của indexSensor thành giá trị của childSensor
     setIndexValue(childValue);
+    
   };
   const [user, dispatch] = useContext(MyUserContext);
+  const [stationInfo, setStationInfo] = useState();
 
   const path = useParams();
   const [data, setData] = useState();
   const listener = useGlobalState('message')[0];
+  const pdata = [
+    {
+        name: "MongoDb",
+        student: 11,
+        fees: 120,
+    },
+    {
+        name: "Javascript",
+        student: 15,
+        fees: 12,
+    },
+    {
+        name: "PHP",
+        student: 5,
+        fees: 10,
+    },
+    {
+        name: "Java",
+        student: 10,
+        fees: 5,
+    },
+    {
+        name: "C#",
+        student: 9,
+        fees: 4,
+    },
+    {
+        name: "C++",
+        student: 10,
+        fees: 8,
+    },
+];
   useEffect(() => {
+    const loadInfoStation = async () =>{
+      const res = await Apis.get(`${endpoints.stationInfo}/${path.id}`, {
+        headers: {
+          Authorization: `Bearer ${cookie.load('token')}`,
+        },
+      });
+      setStationInfo(res.data)
+      console.log(stationInfo)
+    }
     const loaddata = async () => {
       const res = await Apis.get(`${endpoints.current_data}/${path.id}`, {
         headers: {
@@ -127,6 +172,7 @@ export default function Detail() {
       console.log(data);
     };
     loaddata();
+    loadInfoStation();
   }, [listener]);
   const isAuthorized = useGlobalState('isAuthorized')[0];
   if (isAuthorized === false || user == null) {
@@ -152,7 +198,7 @@ export default function Detail() {
             >
               <path d="M5.793 1a1 1 0 0 1 1.414 0l.647.646a.5.5 0 1 1-.708.708L6.5 1.707 2 6.207V12.5a.5.5 0 0 0 .5.5.5.5 0 0 1 0 1A1.5 1.5 0 0 1 1 12.5V7.207l-.146.147a.5.5 0 0 1-.708-.708zm3 1a1 1 0 0 1 1.414 0L12 3.793V2.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v3.293l1.854 1.853a.5.5 0 0 1-.708.708L15 8.207V13.5a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 4 13.5V8.207l-.146.147a.5.5 0 1 1-.708-.708zm.707.707L5 7.207V13.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5V7.207z" />
             </svg>
-            NBIOT 0002
+            {stationInfo.name}
           </div>
           <div className="StationClock" style={(stationBanner, stationInfor)}>
             <iframe
@@ -172,11 +218,11 @@ export default function Detail() {
           </div>
           <div className="StationStage" style={stationBanner}>
             <div>
-              <div>Relay 0001{enable}</div>
+              <div style={{ marginTop: '10px' }}>Relay 0001{enable}</div>
               <div style={{ marginTop: '10px' }}>Relay 0002{disable}</div>
             </div>
             <div>
-              <div>Relay 0003{disable}</div>
+              <div style={{ marginTop: '10px' }}>Relay 0003{disable}</div>
               <div style={{ marginTop: '10px' }}>Relay 0004{disable}</div>
             </div>
           </div>
@@ -202,7 +248,7 @@ export default function Detail() {
             </div>
           </div>
           <div className="ortherSensor" style={{ display: 'flex', flexWrap: 'wrap', cursor: 'pointer' }}>
-            <div className="childSensor" style={childSensor} tabIndex={handleChildClick}>
+            <div className="childSensor" style={childSensor}  tabIndex={() =>{console.log(1)}}>
               <div>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -403,6 +449,22 @@ export default function Detail() {
             </tbody>
           </table>
         </div>
+        <br/>
+        <ResponsiveContainer width="100%" aspect={3}>
+                <LineChart data={pdata} margin={{ right: 300 }}>
+                    <CartesianGrid />
+                    <XAxis dataKey="name" interval={"preserveStartEnd"} />
+                    <YAxis/>
+                    <Legend />
+                    <Tooltip />
+                    <Line
+                        dataKey="student"
+                        stroke="black"
+                        activeDot={{ r: 8 }}
+                    />
+                    <Line dataKey="fees" stroke="red" activeDot={{ r: 8 }} />
+                </LineChart>
+            </ResponsiveContainer>
       </div>
     </>
   );

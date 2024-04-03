@@ -23,7 +23,8 @@ export const endpoints = {
   deletUser:"/api/user/delete",
   getUser:"/api/user",
   editUser :"/api/user/edit-user",
-  createUser:"/api/user/create-user"
+  createUser:"/api/user/create-user",
+  stationInfo:"/api/staion-info"
 };
 export const authApi = () => {
   return axios.create({

@@ -116,6 +116,12 @@ public class StationController {
     ResponseEntity<List<Station>> getAllStation(){
         return new ResponseEntity<>(stationService.getAllStation(),HttpStatus.OK);
     }
+
+    @GetMapping("/api/staion-info/{id}")
+    ResponseEntity<Station> getInfoStion(@PathVariable("id") String id){
+        return new ResponseEntity<>(stationService.findStattionByID(id), HttpStatus.OK);
+    }
+
     @GetMapping("/api/value-sensor/{nameStation}")
     @CrossOrigin
     ResponseEntity<List<SensorValue>> getvalueSensor(@PathVariable String nameStation){
