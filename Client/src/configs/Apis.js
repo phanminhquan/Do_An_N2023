@@ -25,7 +25,11 @@ export const endpoints = {
   editUser :"/api/user/edit-user",
   createUser:"/api/user/create-user",
   stationInfo:"/api/staion-info",
-  listSensor: "http://localhost:9000/api/station/sensor"
+  listSensor: "http://localhost:9000/api/station/sensor",
+  valueSensor1Hour:"http://localhost:9000/api/value-sensor-1h",
+  valueSensor1Day:"http://localhost:9000/api/value-sensor-1d",
+  valueSensor1Week:"http://localhost:9000/api/value-sensor-1w",
+  valueSensor1Month:"http://localhost:9000/api/value-sensor-1m"
 
 };
 export const authApi = () => {

@@ -125,38 +125,87 @@ export default function Detail() {
   const path = useParams();
   const [data, setData] = useState();
   const listener = useGlobalState('message')[0];
-  const pdata = [
-    {
-      name: "MongoDb",
-      student: 11,
-      fees: 120,
-    },
-    {
-      name: "Javascript",
-      student: 15,
-      fees: 12,
-    },
-    {
-      name: "PHP",
-      student: 5,
-      fees: 10,
-    },
-    {
-      name: "Java",
-      student: 10,
-      fees: 5,
-    },
-    {
-      name: "C#",
-      student: 9,
-      fees: 4,
-    },
-    {
-      name: "C++",
-      student: 10,
-      fees: 8,
-    },
-  ];
+  const [data1Hour, setData1Hour] = useState();
+  const [data1Day, setData1Day] = useState();
+  const [data1Week, setData1Week] = useState();
+  const [data1Month, setData1Mont] = useState();
+  const [sensorID, setSensorID] = useState();
+
+
+  const handleOnChangeSensor = (e) => {
+    setSensorID(e)
+    const data1h = [];
+    const data1d = [];
+    const data1w = [];
+    const data1m = [];
+    
+    const loadInfoSensor1Hour = async () => {
+      const res = await Apis.get(`${endpoints.valueSensor1Hour}/${e}`, {
+        headers: {
+          Authorization: `Bearer ${cookie.load('token')}`,
+        },
+      });
+      for (let i = 0; i < res.data.length; i+=1) {
+        data1h.push({
+          name: `${res.data[i].timeUpdate}`,
+          value: res.data[i].value,
+        })
+      }
+      setData1Hour(data1h);
+    }
+
+    const loadInfoSensor1Day = async () => {
+      const res = await Apis.get(`${endpoints.valueSensor1Day}/${e}`, {
+        headers: {
+          Authorization: `Bearer ${cookie.load('token')}`,
+        },
+      });
+      for (let i = 0; i < res.data.length; i+=1) {
+        data1d.push({
+          name: `${res.data[i].timeUpdate}`,
+          value: res.data[i].value,
+        })
+      }
+      setData1Day(data1d);
+    }
+
+
+    const loadInfoSensor1Week = async () => {
+      const res = await Apis.get(`${endpoints.valueSensor1Week}/${e}`, {
+        headers: {
+          Authorization: `Bearer ${cookie.load('token')}`,
+        },
+      });
+      for (let i = 0; i < res.data.length; i+=1) {
+        data1w.push({
+          name: `${res.data[i].timeUpdate}`,
+          value: res.data[i].value,
+        })
+      }
+      setData1Week(data1w);
+    }
+
+    const loadInfoSensor1Monh = async () => {
+      const res = await Apis.get(`${endpoints.valueSensor1Month}/${e}`, {
+        headers: {
+          Authorization: `Bearer ${cookie.load('token')}`,
+        },
+      });
+      for (let i = 0; i < res.data.length; i+=1) {
+
+        data1m.push({
+          name: `${res.data[i].timeUpdate}`,
+          value: res.data[i].value,
+        })
+      }
+      setData1Mont(data1m);
+    }
+    loadInfoSensor1Hour();
+    loadInfoSensor1Week();
+    loadInfoSensor1Day();
+    loadInfoSensor1Monh();
+
+  }
   useEffect(() => {
     const loadInfoStation = async () => {
       const res = await Apis.get(`${endpoints.stationInfo}/${path.id}`, {
@@ -233,10 +282,10 @@ export default function Detail() {
           Authorization: `Bearer ${cookie.load('token')}`,
         },
       });
+      const sensorSelected  = document.getElementById("selectedSensor")
+      handleOnChangeSensor(sensorSelected===null?resSensor.data[0].id:sensorSelected.value)
+      setSensorID(sensorSelected===null?resSensor.data[0].id:sensorSelected.value)
       setSensor(resSensor.data);
-
-
-
       if (res.data === '') {
         setGlobalState('isAuthorized', false);
       } else {
@@ -246,6 +295,7 @@ export default function Detail() {
     };
     loaddata();
     loadInfoStation();
+  
   }, [listener]);
   const isAuthorized = useGlobalState('isAuthorized')[0];
   if (isAuthorized === false || user == null) {
@@ -471,8 +521,10 @@ export default function Detail() {
         </div>
         <div className="MinMaxSensor" style={{ marginTop: '20px', marginLeft: '8px' }}>
           <select
+            id='selectedSensor'
+          
             style={{ width: '30%', height: '25px', border: '0.2px', boxShadow: '5px 5px 10px 0 rgba(0, 0, 0, 0.1)' }}
-            onChange={(e) => { console.log(e.target.value) }}
+            onChange={(e) => { handleOnChangeSensor(e.target.value) }}
           >
             {sensor.map((element) => {
               return (
@@ -480,7 +532,7 @@ export default function Detail() {
               )
             })}
 
-      
+
           </select>
           <table style={{ borderCollapse: 'collapse', width: '100%', marginTop: '5px', backgroundColor: '#ffffff' }}>
             <thead>
@@ -510,20 +562,73 @@ export default function Detail() {
             </tbody>
           </table>
         </div>
-        <br />
+        <br /><br /><br />
+        <h1 className='text-center'>{sensorID}</h1>
+        <br /><br />
+        <h3 className='text-center'>Giá trị trong vòng 1 giờ qua</h3>
         <ResponsiveContainer width="100%" aspect={3}>
-          <LineChart data={pdata} margin={{ right: 300 }}>
+          <LineChart data={data1Hour} margin={{ right: 300 }}>
             <CartesianGrid />
             <XAxis dataKey="name" interval={"preserveStartEnd"} />
             <YAxis />
             <Legend />
             <Tooltip />
             <Line
-              dataKey="student"
+              dataKey="value"
               stroke="black"
               activeDot={{ r: 8 }}
             />
-            <Line dataKey="fees" stroke="red" activeDot={{ r: 8 }} />
+          </LineChart>
+        </ResponsiveContainer>
+        <br /><br /><br />
+        <h3 className='text-center'>Giá trị trong vòng 1 ngày qua</h3>
+        <ResponsiveContainer width="100%" aspect={3}>
+          <LineChart data={data1Day} margin={{ right: 300 }}>
+            <CartesianGrid />
+            <XAxis dataKey="name" interval={"preserveStartEnd"} />
+            <YAxis />
+            <Legend />
+            <Tooltip />
+            <Line
+              dataKey="value"
+              stroke="black"
+              activeDot={{ r: 8 }}
+            />
+            
+          </LineChart>
+        </ResponsiveContainer>
+        <br /><br /><br />
+        <h3 className='text-center'>Giá trị trong vòng 1 tuần qua</h3>
+        <ResponsiveContainer width="100%" aspect={3}>
+          <LineChart data={data1Week} margin={{ right: 300 }}>
+            <CartesianGrid />
+            <XAxis dataKey="name" interval={"preserveStartEnd"} />
+            <YAxis />
+            <Legend />
+            <Tooltip />
+            <Line
+              dataKey="value"
+              stroke="black"
+              activeDot={{ r: 8 }}
+            />
+           
+          </LineChart>
+        </ResponsiveContainer>
+        <br /><br /><br />
+        <h3 className='text-center'>Giá trị trong vòng 1 tháng qua</h3>
+        <ResponsiveContainer width="100%" aspect={3}>
+          <LineChart data={data1Month} margin={{ right: 300 }}>
+            <CartesianGrid />
+            <XAxis dataKey="name" interval={"preserveStartEnd"} />
+            <YAxis />
+            <Legend />
+            <Tooltip />
+            <Line
+              dataKey="value" 
+              stroke="black"
+              activeDot={{ r: 8 }}
+            />
+           
           </LineChart>
         </ResponsiveContainer>
       </div>
