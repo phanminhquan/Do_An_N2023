@@ -15,8 +15,6 @@ import Expired from './Expired';
 import Apis, { endpoints } from '../configs/Apis';
 import { MyUserContext } from '../App';
 
-
-
 const CanvasJS = CanvasJSReact.CanvasJS;
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 const indexPage = {
@@ -100,14 +98,18 @@ const enable = (
 );
 
 export default function Detail() {
-  const [childValue, setChildValue] = useState(1);
   const [indexValue, setIndexValue] = useState(1);
+  const [nameValue, setNameValue] = useState(1);
 
   // Hàm xử lý sự kiện khi nhấp chuột vào childSensor
-  const handleChildClick = () => {
+  const handleChildClick = (event, sensorId, value) => {
+    event.preventDefault();
     // Cập nhật giá trị của indexSensor thành giá trị của childSensor
-    setIndexValue(childValue);
-
+    console.log(event);
+    console.log(sensorId);
+    console.log(value);
+    setIndexValue(value);
+    setNameValue(sensorId);
   };
   const [user, dispatch] = useContext(MyUserContext);
   const [stationInfo, setStationInfo] = useState();
@@ -119,7 +121,7 @@ export default function Detail() {
   const [ec, setEC] = useState();
   const [kali, setKali] = useState();
   const [photpho, setPhotpho] = useState();
-  const [nito, setNito] = useState()
+  const [nito, setNito] = useState();
 
   const [sensor, setSensor] = useState();
   const path = useParams();
@@ -131,28 +133,27 @@ export default function Detail() {
   const [data1Month, setData1Mont] = useState();
   const [sensorID, setSensorID] = useState();
 
-
   const handleOnChangeSensor = (e) => {
-    setSensorID(e)
+    setSensorID(e);
     const data1h = [];
     const data1d = [];
     const data1w = [];
     const data1m = [];
-    
+
     const loadInfoSensor1Hour = async () => {
       const res = await Apis.get(`${endpoints.valueSensor1Hour}/${e}`, {
         headers: {
           Authorization: `Bearer ${cookie.load('token')}`,
         },
       });
-      for (let i = 0; i < res.data.length; i+=1) {
+      for (let i = 0; i < res.data.length; i += 1) {
         data1h.push({
           name: `${res.data[i].timeUpdate}`,
           value: res.data[i].value,
-        })
+        });
       }
       setData1Hour(data1h);
-    }
+    };
 
     const loadInfoSensor1Day = async () => {
       const res = await Apis.get(`${endpoints.valueSensor1Day}/${e}`, {
@@ -160,15 +161,14 @@ export default function Detail() {
           Authorization: `Bearer ${cookie.load('token')}`,
         },
       });
-      for (let i = 0; i < res.data.length; i+=1) {
+      for (let i = 0; i < res.data.length; i += 1) {
         data1d.push({
           name: `${res.data[i].timeUpdate}`,
           value: res.data[i].value,
-        })
+        });
       }
       setData1Day(data1d);
-    }
-
+    };
 
     const loadInfoSensor1Week = async () => {
       const res = await Apis.get(`${endpoints.valueSensor1Week}/${e}`, {
@@ -176,14 +176,14 @@ export default function Detail() {
           Authorization: `Bearer ${cookie.load('token')}`,
         },
       });
-      for (let i = 0; i < res.data.length; i+=1) {
+      for (let i = 0; i < res.data.length; i += 1) {
         data1w.push({
           name: `${res.data[i].timeUpdate}`,
           value: res.data[i].value,
-        })
+        });
       }
       setData1Week(data1w);
-    }
+    };
 
     const loadInfoSensor1Monh = async () => {
       const res = await Apis.get(`${endpoints.valueSensor1Month}/${e}`, {
@@ -191,21 +191,19 @@ export default function Detail() {
           Authorization: `Bearer ${cookie.load('token')}`,
         },
       });
-      for (let i = 0; i < res.data.length; i+=1) {
-
+      for (let i = 0; i < res.data.length; i += 1) {
         data1m.push({
           name: `${res.data[i].timeUpdate}`,
           value: res.data[i].value,
-        })
+        });
       }
       setData1Mont(data1m);
-    }
+    };
     loadInfoSensor1Hour();
     loadInfoSensor1Week();
     loadInfoSensor1Day();
     loadInfoSensor1Monh();
-
-  }
+  };
   useEffect(() => {
     const loadInfoStation = async () => {
       const res = await Apis.get(`${endpoints.stationInfo}/${path.id}`, {
@@ -213,9 +211,9 @@ export default function Detail() {
           Authorization: `Bearer ${cookie.load('token')}`,
         },
       });
-      setStationInfo(res.data)
-      console.log(stationInfo)
-    }
+      setStationInfo(res.data);
+      console.log(stationInfo);
+    };
     const loaddata = async () => {
       const res = await Apis.get(`${endpoints.current_data}/${path.id}`, {
         headers: {
@@ -282,9 +280,9 @@ export default function Detail() {
           Authorization: `Bearer ${cookie.load('token')}`,
         },
       });
-      const sensorSelected  = document.getElementById("selectedSensor")
-      handleOnChangeSensor(sensorSelected===null?resSensor.data[0].id:sensorSelected.value)
-      setSensorID(sensorSelected===null?resSensor.data[0].id:sensorSelected.value)
+      const sensorSelected = document.getElementById('selectedSensor');
+      handleOnChangeSensor(sensorSelected === null ? resSensor.data[0].id : sensorSelected.value);
+      setSensorID(sensorSelected === null ? resSensor.data[0].id : sensorSelected.value);
       setSensor(resSensor.data);
       if (res.data === '') {
         setGlobalState('isAuthorized', false);
@@ -295,7 +293,6 @@ export default function Detail() {
     };
     loaddata();
     loadInfoStation();
-  
   }, [listener]);
   const isAuthorized = useGlobalState('isAuthorized')[0];
   if (isAuthorized === false || user == null) {
@@ -343,8 +340,8 @@ export default function Detail() {
             {relay.map((element) => {
               return (
                 <div style={{ marginTop: '10px' }}>
-                  {`${element.sensor.id.split("_")[0]} ${element.sensor.id.split("_")[1]}`}
-                  {element.value === "true" ? enable : disable}
+                  {`${element.sensor.id.split('_')[0]} ${element.sensor.id.split('_')[1]}`}
+                  {element.value === 'true' ? enable : disable}
                 </div>
               );
             })}
@@ -370,14 +367,23 @@ export default function Detail() {
               </svg>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <h5>nhiệt độ</h5>
+              <h5>{nameValue}</h5>
               <div>{indexValue}</div>
             </div>
           </div>
           <div className="ortherSensor" style={{ display: 'flex', flexWrap: 'wrap', cursor: 'pointer' }}>
             {temp.map((element) => {
               return (
-                <div className="childSensor" style={childSensor} tabIndex={() => { console.log(1) }}>
+                <button
+                  className="childSensor"
+                  style={childSensor}
+                  onClick={(event) =>
+                    handleChildClick(event, `nhiệt độ${element.sensor.id.split('_')[1]}`, element.value)
+                  }
+                  tabIndex={() => {
+                    console.log(1);
+                  }}
+                >
                   <div>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -392,15 +398,19 @@ export default function Detail() {
                     </svg>
                   </div>
                   <div style={{ textAlign: 'center' }}>
-                    <h5>nhiệt độ {element.sensor.id.split("_")[1]}</h5>
+                    <h5>nhiệt độ {element.sensor.id.split('_')[1]}</h5>
                     <div>{element.value}</div>
                   </div>
-                </div>
+                </button>
               );
             })}
             {humi.map((element) => {
               return (
-                <div className="childSensor" style={childSensor}>
+                <button
+                  className="childSensor"
+                  style={childSensor}
+                  onClick={(event) => handleChildClick(event, `Độ ẩm${element.sensor.id.split('_')[1]}`, element.value)}
+                >
                   <div>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -421,15 +431,19 @@ export default function Detail() {
                     </svg>
                   </div>
                   <div style={{ textAlign: 'center' }}>
-                    <h5>Độ ẩm {element.sensor.id.split("_")[1]}</h5>
+                    <h5>Độ ẩm {element.sensor.id.split('_')[1]}</h5>
                     <div>{element.value}</div>
                   </div>
-                </div>
+                </button>
               );
             })}
             {ph.map((element) => {
               return (
-                <div className="childSensor" style={childSensor}>
+                <button
+                  className="childSensor"
+                  style={childSensor}
+                  onClick={(event) => handleChildClick(event, `Độ PH${element.sensor.id.split('_')[1]}`, element.value)}
+                >
                   <div>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -443,16 +457,22 @@ export default function Detail() {
                     </svg>
                   </div>
                   <div style={{ textAlign: 'center' }}>
-                    <h5>Độ PH {element.sensor.id.split("_")[1]}</h5>
+                    <h5>Độ PH {element.sensor.id.split('_')[1]}</h5>
                     <div>{element.value}</div>
                   </div>
-                </div>
+                </button>
               );
             })}
 
             {ec.map((element) => {
               return (
-                <div className="childSensor" style={childSensor}>
+                <button
+                  className="childSensor"
+                  style={childSensor}
+                  onClick={(event) =>
+                    handleChildClick(event, `Độ dẫn nhiệt${element.sensor.id.split('_')[1]}`, element.value)
+                  }
+                >
                   <div>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -466,73 +486,84 @@ export default function Detail() {
                     </svg>
                   </div>
                   <div style={{ textAlign: 'center' }}>
-                    <h5>Độ dẫn nhiệt {element.sensor.id.split("_")[1]}</h5>
+                    <h5>Độ dẫn nhiệt {element.sensor.id.split('_')[1]}</h5>
                     <div>{element.value}</div>
                   </div>
-                </div>
+                </button>
               );
             })}
             {kali.map((element) => {
               return (
-                <div className="childSensor" style={childSensor}>
+                <button
+                  className="childSensor"
+                  style={childSensor}
+                  onClick={(event) => handleChildClick(event, `Kali${element.sensor.id.split('_')[1]}`, element.value)}
+                >
                   <div>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" width="50" height="50">
                       <path d="M311 86.3c12.3-12.7 12-32.9-.7-45.2s-32.9-12-45.2 .7l-155.2 160L64 249V64c0-17.7-14.3-32-32-32S0 46.3 0 64V328 448c0 17.7 14.3 32 32 32s32-14.3 32-32V341l64.7-66.7 133 192c10.1 14.5 30 18.1 44.5 8.1s18.1-30 8.1-44.5L174.1 227.4 311 86.3z" />
                     </svg>
                   </div>
                   <div style={{ textAlign: 'center' }}>
-                    <h5>Kali {element.sensor.id.split("_")[1]}</h5>
+                    <h5>Kali {element.sensor.id.split('_')[1]}</h5>
                     <div>{element.value}</div>
                   </div>
-                </div>
+                </button>
               );
             })}
             {nito.map((element) => {
               return (
-                <div className="childSensor" style={childSensor}>
+                <button
+                  className="childSensor"
+                  style={childSensor}
+                  onClick={(event) => handleChildClick(event, `Nito${element.sensor.id.split('_')[1]}`, element.value)}
+                >
                   <div>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="50" height="50">
                       <path d="M21.1 33.9c12.7-4.6 26.9-.7 35.5 9.6L320 359.6V64c0-17.7 14.3-32 32-32s32 14.3 32 32V448c0 13.5-8.4 25.5-21.1 30.1s-26.9 .7-35.5-9.6L64 152.4V448c0 17.7-14.3 32-32 32s-32-14.3-32-32V64C0 50.5 8.4 38.5 21.1 33.9z" />
                     </svg>
                   </div>
                   <div style={{ textAlign: 'center' }}>
-                    <h5>Nito {element.sensor.id.split("_")[1]}</h5>
+                    <h5>Nito {element.sensor.id.split('_')[1]}</h5>
                     <div>{element.value}</div>
                   </div>
-                </div>
+                </button>
               );
             })}
             {photpho.map((element) => {
               return (
-                <div className="childSensor" style={childSensor}>
+                <button
+                  className="childSensor"
+                  style={childSensor}
+                  onClick={(event) =>
+                    handleChildClick(event, `Photpho${element.sensor.id.split('_')[1]}`, element.value)
+                  }
+                >
                   <div>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" width="50" height="50">
                       <path d="M0 96C0 60.7 28.7 32 64 32h96c88.4 0 160 71.6 160 160s-71.6 160-160 160H64v96c0 17.7-14.3 32-32 32s-32-14.3-32-32V320 96zM64 288h96c53 0 96-43 96-96s-43-96-96-96H64V288z" />
                     </svg>
                   </div>
                   <div style={{ textAlign: 'center' }}>
-                    <h5>Photpho {element.sensor.id.split("_")[1]}</h5>
+                    <h5>Photpho {element.sensor.id.split('_')[1]}</h5>
                     <div>{element.value}</div>
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
         </div>
         <div className="MinMaxSensor" style={{ marginTop: '20px', marginLeft: '8px' }}>
           <select
-            id='selectedSensor'
-          
+            id="selectedSensor"
             style={{ width: '30%', height: '25px', border: '0.2px', boxShadow: '5px 5px 10px 0 rgba(0, 0, 0, 0.1)' }}
-            onChange={(e) => { handleOnChangeSensor(e.target.value) }}
+            onChange={(e) => {
+              handleOnChangeSensor(e.target.value);
+            }}
           >
             {sensor.map((element) => {
-              return (
-                <option value={element.id}>{element.id}</option>
-              )
+              return <option value={element.id}>{element.id}</option>;
             })}
-
-
           </select>
           <table style={{ borderCollapse: 'collapse', width: '100%', marginTop: '5px', backgroundColor: '#ffffff' }}>
             <thead>
@@ -562,73 +593,63 @@ export default function Detail() {
             </tbody>
           </table>
         </div>
-        <br /><br /><br />
-        <h1 className='text-center'>{sensorID}</h1>
-        <br /><br />
-        <h3 className='text-center'>Giá trị trong vòng 1 giờ qua</h3>
+        <br />
+        <br />
+        <br />
+        <h1 className="text-center">{sensorID}</h1>
+        <br />
+        <br />
+        <h3 className="text-center">Giá trị trong vòng 1 giờ qua</h3>
         <ResponsiveContainer width="100%" aspect={3}>
           <LineChart data={data1Hour} margin={{ right: 300 }}>
             <CartesianGrid />
-            <XAxis dataKey="name" interval={"preserveStartEnd"} />
+            <XAxis dataKey="name" interval={'preserveStartEnd'} />
             <YAxis />
             <Legend />
             <Tooltip />
-            <Line
-              dataKey="value"
-              stroke="black"
-              activeDot={{ r: 8 }}
-            />
+            <Line dataKey="value" stroke="black" activeDot={{ r: 8 }} />
           </LineChart>
         </ResponsiveContainer>
-        <br /><br /><br />
-        <h3 className='text-center'>Giá trị trong vòng 1 ngày qua</h3>
+        <br />
+        <br />
+        <br />
+        <h3 className="text-center">Giá trị trong vòng 1 ngày qua</h3>
         <ResponsiveContainer width="100%" aspect={3}>
           <LineChart data={data1Day} margin={{ right: 300 }}>
             <CartesianGrid />
-            <XAxis dataKey="name" interval={"preserveStartEnd"} />
+            <XAxis dataKey="name" interval={'preserveStartEnd'} />
             <YAxis />
             <Legend />
             <Tooltip />
-            <Line
-              dataKey="value"
-              stroke="black"
-              activeDot={{ r: 8 }}
-            />
-            
+            <Line dataKey="value" stroke="black" activeDot={{ r: 8 }} />
           </LineChart>
         </ResponsiveContainer>
-        <br /><br /><br />
-        <h3 className='text-center'>Giá trị trong vòng 1 tuần qua</h3>
+        <br />
+        <br />
+        <br />
+        <h3 className="text-center">Giá trị trong vòng 1 tuần qua</h3>
         <ResponsiveContainer width="100%" aspect={3}>
           <LineChart data={data1Week} margin={{ right: 300 }}>
             <CartesianGrid />
-            <XAxis dataKey="name" interval={"preserveStartEnd"} />
+            <XAxis dataKey="name" interval={'preserveStartEnd'} />
             <YAxis />
             <Legend />
             <Tooltip />
-            <Line
-              dataKey="value"
-              stroke="black"
-              activeDot={{ r: 8 }}
-            />
-           
+            <Line dataKey="value" stroke="black" activeDot={{ r: 8 }} />
           </LineChart>
         </ResponsiveContainer>
-        <br /><br /><br />
-        <h3 className='text-center'>Giá trị trong vòng 1 tháng qua</h3>
+        <br />
+        <br />
+        <br />
+        <h3 className="text-center">Giá trị trong vòng 1 tháng qua</h3>
         <ResponsiveContainer width="100%" aspect={3}>
           <LineChart data={data1Month} margin={{ right: 300 }}>
             <CartesianGrid />
-            <XAxis dataKey="name" interval={"preserveStartEnd"} />
+            <XAxis dataKey="name" interval={'preserveStartEnd'} />
             <YAxis />
             <Legend />
             <Tooltip />
-            <Line
-              dataKey="value" 
-              stroke="black"
-              activeDot={{ r: 8 }}
-            />
-           
+            <Line dataKey="value" stroke="black" activeDot={{ r: 8 }} />
           </LineChart>
         </ResponsiveContainer>
       </div>
