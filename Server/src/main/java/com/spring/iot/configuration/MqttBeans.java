@@ -102,23 +102,11 @@ public class MqttBeans {
         return new MessageHandler() {
             @Override
             public void handleMessage(Message<?> message) throws MessagingException {
+                System.out.println(message.getPayload());
                 String topic = message.getHeaders().get(MqttHeaders.RECEIVED_TOPIC).toString();
                 DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                 Calendar cal = Calendar.getInstance();
                 JSONArray myjson = null;
-//                List<List<Object>> data = new ArrayList<>();
-//                List<Object> list2 = new ArrayList<>();
-//                list2.add("ada");
-//                list2.add("111");
-//                data.add(list2);
-//                ArrayList<Object> data1 = new ArrayList<>(Arrays.asList("Source","DES"));
-//                try {
-//                    sheetService.writeSheet(data1,"A1","1_qkbqLKtL0Fk0pxWR5M_9H-0DUePUu4rRTd4hpN2piI");
-//                } catch (IOException e) {
-//                    throw new RuntimeException(e);
-//                } catch (GeneralSecurityException e) {
-//                    throw new RuntimeException(e);
-//                }
                 try {
                     myjson = new JSONArray( "["+message.getPayload().toString() +"]");
                     List<Station> listStationInJSON = new ArrayList<>();
